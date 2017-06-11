@@ -1,6 +1,9 @@
 var neighborhood_city = 'Ludhiana, India'; //used to initialise map
 var neighborhood_places = ["Verka Milk Plant", "MBD Mall", "Orient Cinemas", "Kipps Market", "Aarti Cinemas"];
 
+var map;
+var markers = {};
+
 function initMap() {
 
     var geocoder = new google.maps.Geocoder();
@@ -15,10 +18,40 @@ function initMap() {
                 zoom: 13
             });
 
+            for (var i = 0; i < neighborhood_places.length; i++) {
+
+                var address = neighborhood_places[i] + ' ' + neighborhood_city;
+                creatMarker(geocoder,address,i);
+
+            }
+
         } else {
-            alert("Please select a valid neighborhood city in script.js");
+            alert("Some error occured. Please recheck your configuration and reload again");
         }
     })
+
+}
+
+function creatMarker(geocoder,address, i) {
+
+    geocoder.geocode({'address': address}, function(results, status) {
+
+        if (status === google.maps.GeocoderStatus.OK) {
+
+            var position = results[0].geometry.location;
+
+            var marker = new google.maps.Marker({
+                position : position,
+                title : neighborhood_places[i],
+                animation: google.maps.Animation.DROP,
+                id: i,
+                map: map
+            });
+
+            markers[neighborhood_places[i]] = marker;
+        }
+
+    });
 
 }
 
@@ -49,4 +82,26 @@ var view_model = function() {
 
 };
 
+$('#filter').click(function(e){
+    var filtered_places = ko.contextFor(e.target).$data.filtered_places_list();
+
+    for (var place in markers) {
+
+        var marker  = markers[place];
+        var index   = $.inArray(place, filtered_places);
+
+        if(index != -1) {
+            marker.setMap(map);
+        } else {
+            marker.setMap(null);
+        }
+    }
+});
+
 ko.applyBindings(new view_model());
+
+
+
+
+
+
