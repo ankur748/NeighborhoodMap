@@ -1,3 +1,11 @@
+function initMap() {
+    //alert("Loaded");
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: 40.7413549, lng: -73.9980244},
+        zoom: 13
+    });
+}
+
 var neighborhood_places = ["Verka Milk Plant", "MBD Mall", "Orient Cinemas", "Kipps Market", "Aarti Cinemas"];
 
 var view_model = function() {
@@ -10,12 +18,6 @@ var view_model = function() {
     neighborhood_places.forEach(function(place){
         self.places_list.push(place);
     });
-
-    // self.searchFilter = function(data,event) {
-
-    //     debugger;
-    //     var searched_place = data.searched_place();
-    // };
 
     self.filtered_places_list = ko.computed(function() {
 
