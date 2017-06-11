@@ -10,16 +10,20 @@
 <body class="container">
     <h1>Neighborhood Map</h1>
     <div class="row" id="main-container">
-        <div class="col-xs-3">
+        <div class="col-xs-2">
             <a data-toggle="collapse" href="#search-menu" class="btn btn-info btn-sm">
                 <span class="glyphicon glyphicon-menu-hamburger"></span>
             </a>
             <br>
             <br>
             <div id="search-menu" class="form panel-collapse collapse">
-                <div class="form-group">
+                <div class="input-group">
                     <input id="searchinput" data-bind="textInput : searched_place" class="form-control" type="search" placeholder="Search..." />
+                    <div class="input-group-btn">
+                        <button id="filter" class="btn btn-info" type="submit">Filter</button>
+                    </div>
                 </div>
+                <br>
                 <div id="searchlist" class="list-group" data-bind="foreach: filtered_places_list">
                     <a class="list-group-item" href="#"><span data-bind="text: $data"></span></a>
                 </div>
@@ -28,6 +32,7 @@
     </div>
     <div id="map" class="row">
     </div>
+    <!--script tags start-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="js/lib/knockout-3.4.2.js"></script>

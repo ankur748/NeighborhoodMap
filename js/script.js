@@ -1,12 +1,26 @@
-function initMap() {
-    //alert("Loaded");
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: 40.7413549, lng: -73.9980244},
-        zoom: 13
-    });
-}
-
+var neighborhood_city = 'Ludhiana, India'; //used to initialise map
 var neighborhood_places = ["Verka Milk Plant", "MBD Mall", "Orient Cinemas", "Kipps Market", "Aarti Cinemas"];
+
+function initMap() {
+
+    var geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode({'address': neighborhood_city}, function(results, status) {
+
+        if (status === google.maps.GeocoderStatus.OK) {
+
+            var center = results[0].geometry.location;
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: center,
+                zoom: 13
+            });
+
+        } else {
+            alert("Please select a valid neighborhood city in script.js");
+        }
+    })
+
+}
 
 var view_model = function() {
 
