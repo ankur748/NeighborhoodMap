@@ -45,13 +45,42 @@ function creatMarker(geocoder,address, i) {
                 title : neighborhood_places[i],
                 animation: google.maps.Animation.DROP,
                 id: i,
-                map: map
+                map: map,
+                icon: clicked_marker("red")
+            });
+
+            marker.addListener('click', function(){
+                reset_markers();
+                this.setIcon(clicked_marker("blue"));
+                this.setAnimation(google.maps.Animation.BOUNCE);
             });
 
             markers[neighborhood_places[i]] = marker;
         }
 
     });
+
+}
+
+function clicked_marker(color) {
+    var icon = {
+        url: "http://maps.google.com/mapfiles/ms/icons/"+ color + "-dot.png",
+        size: new google.maps.Size(100, 100),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(17, 34),
+        scaledSize: new google.maps.Size(25, 25)
+    }
+    return icon;
+}
+
+function reset_markers() {
+
+    for (var place in markers) {
+
+        var marker  = markers[place];
+        marker.setAnimation(null);
+        marker.setIcon(clicked_marker("red"));
+    }
 
 }
 
@@ -83,6 +112,7 @@ var view_model = function() {
 };
 
 $('#filter').click(function(e){
+
     var filtered_places = ko.contextFor(e.target).$data.filtered_places_list();
 
     for (var place in markers) {
