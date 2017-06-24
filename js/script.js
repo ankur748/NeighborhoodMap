@@ -1,5 +1,6 @@
 var neighborhood_city = 'Ludhiana, India'; //used to initialise map
-var neighborhood_places = ["Verka Milk Plant", "MBD Mall", "Orient Cinemas", "Kipps Market", "Aarti Cinemas"];
+var neighborhood_places = ["Aman Chicken", "Indian Summer", "Rutba", "Barbeque Nation",
+"Bistro 226", "Rishi Dhaba", "Sagar Ratna"];
 var zomato_key = "427d11dab5abc0e5b2ce4b8882bff226"
 
 var map;
@@ -68,10 +69,10 @@ function creatMarker(geocoder,address, i) {
 function make_marker(color) {
     var icon = {
         url: "http://maps.google.com/mapfiles/ms/icons/"+ color + "-dot.png",
-        size: new google.maps.Size(35, 35),
+        size: new google.maps.Size(30, 30),
         origin: new google.maps.Point(0, 0),
         anchor: new google.maps.Point(17, 34),
-        scaledSize: new google.maps.Size(35, 35)
+        scaledSize: new google.maps.Size(30, 30)
     }
     return icon;
 }
