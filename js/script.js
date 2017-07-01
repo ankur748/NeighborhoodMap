@@ -1,11 +1,14 @@
-var neighborhood_city = 'Ludhiana, India'; //used to initialise map
+var neighborhood_city = 'Ludhiana';
 var neighborhood_places = ["Aman Chicken", "Indian Summer", "Rutba", "Barbeque Nation",
 "Bistro 226", "Rishi Dhaba", "Sagar Ratna"];
-var zomato_key = "427d11dab5abc0e5b2ce4b8882bff226"
 
 var map;
 var markers = {};
+var zomato_key_mapping = {};
 var info_window;
+
+var zomato_key = "427d11dab5abc0e5b2ce4b8882bff226";
+var zomato_entities = {};
 
 function initMap() {
 
@@ -25,7 +28,6 @@ function initMap() {
 
                 var address = neighborhood_places[i] + ' ' + neighborhood_city;
                 creatMarker(geocoder,address,i);
-
             }
 
         } else {
@@ -33,6 +35,26 @@ function initMap() {
         }
     })
 
+}
+
+function getZomatoEntitites(position, i) {
+
+    var zomato_url = "https://developers.zomato.com/api/v2.1/search"
+
+    zomato_url += "?" +$.param({
+        lat: position.lat(),
+        lon: position.lng()
+    });
+
+    $.ajax({
+        url: zomato_url,
+        headers: {  Accept : "text/plain; charset=utf-8",
+                    "Content-Type": "text/plain; charset=utf-8",
+                    "X-Zomato-API-Key": zomato_key },
+        success: function(data) {
+            zomato_key_mapping[neighborhood_places[i]] = data.restaurants[0].restaurant.id;
+        }
+    })
 }
 
 function creatMarker(geocoder,address, i) {
@@ -60,6 +82,7 @@ function creatMarker(geocoder,address, i) {
             });
 
             markers[neighborhood_places[i]] = marker;
+            getZomatoEntitites(position,i);
         }
 
     });
@@ -98,7 +121,7 @@ function populate_info_window(marker) {
         return;
     }
 
-    info_window.setContent(marker.title);
+    info_window.setContent('<div>' + marker.title + '</div><div id="zomato_info"></div>');
     info_window.marker = marker;
 
     info_window.addListener('closeclick', function() {
