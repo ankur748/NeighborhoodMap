@@ -1,6 +1,5 @@
 var neighborhood_city = 'Ludhiana';
-var neighborhood_places = ["Aman Chicken", "Indian Summer", "Rutba", "Barbeque Nation",
-"Bistro 226", "Rishi Dhaba", "Sagar Ratna"];
+var neighborhood_places = ["Aman Chicken", "Indian Summer", "Rutba", "Barbeque Nation", "Bistro 226", "Rishi Dhaba", "Friend Dhaba", "Stardrunks", "Under Dogs", "Yellow Chilli"];
 
 var map;
 var markers = {};
@@ -121,12 +120,31 @@ function populate_info_window(marker) {
         return;
     }
 
-    info_window.setContent('<div>' + marker.title + '</div><div id="zomato_info"></div>');
+    info_window.setContent('<div>' + marker.title + '</div><br><div id="zomato_info"><img id="thumb_image" src=""><br><br><div id="rating"><span>User Rating: </span></div><div id="cost"><span>Cost for two: </span></div><br><div><b><i>Powered by Zomato</i></b></div></div>');
     info_window.marker = marker;
 
     info_window.addListener('closeclick', function() {
         info_window.marker = null;
     });
+
+    var zomato_url = "https://developers.zomato.com/api/v2.1/restaurant"
+
+    zomato_url += "?" +$.param({
+        res_id: zomato_key_mapping[marker.title]
+    });
+
+    $.ajax({
+        url: zomato_url,
+        headers: {  Accept : "text/plain; charset=utf-8",
+                    "Content-Type": "text/plain; charset=utf-8",
+                    "X-Zomato-API-Key": zomato_key },
+        success: function(data) {
+            debugger;
+            $('#rating span').append(data.user_rating.aggregate_rating + '/5');
+            $('#cost span').append('Rs. ' + data.average_cost_for_two);
+            $('#thumb_image').attr('src', data.thumb);
+        }
+    })
 
     info_window.open(map, marker);
 
