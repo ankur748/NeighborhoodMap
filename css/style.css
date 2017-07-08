@@ -11,23 +11,13 @@ body,
     height: 100%;
 }
 
-/*@media screen and (min-width: 993px) {
-
-    #searchlist {
-        display: all;
-    }
-
-    #hamburger-icon {
-        display: none;
-    }
-
-}
-
 @media screen and (max-width: 992px) {
     #searchlist {
-        display: none;
+        z-index: 2000;
+        width: 25em;
+        position: fixed;
     }
-}*/
+}
 
 #hamburger-icon {
     position: fixed;

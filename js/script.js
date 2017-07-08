@@ -228,10 +228,6 @@ $('#searchinput').keypress(function (e) {
 
 });
 
-$('#hamburger-icon').on('visible', function() {
-    alert("do something");
-});
-
 ko.applyBindings(new view_model());
 
 
