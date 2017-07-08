@@ -1,14 +1,19 @@
-var neighborhood_city = 'Ludhiana';
-var neighborhood_places = ["Aman Chicken", "Indian Summer", "Rutba", "Barbeque Nation", "Bistro 226", "Rishi Dhaba", "Friend Dhaba", "Stardrunks", "Under Dogs", "Yellow Chilli"];
+//to be configured to your data
+var neighborhood_city = 'Ludhiana'; //set to the city where your restaurants are based out of
+var neighborhood_places = ["Aman Chicken", "Indian Summer", "Rutba", "Barbeque Nation", "Bistro 226",
+"Rishi Dhaba", "Friend Dhaba", "Stardrunks", "Under Dogs", "Yellow Chilli"]; //restaurant names to be shown on map
 
+//3rd party API - to be configured to your API key
+var zomato_key = "427d11dab5abc0e5b2ce4b8882bff226";
+
+//model used for application
 var map;
 var markers = {};
 var zomato_key_mapping = {};
 var info_window;
-
-var zomato_key = "427d11dab5abc0e5b2ce4b8882bff226";
 var zomato_entities = {};
 
+//intial callback after google map is initilised to center it to neighborhood city
 function initMap() {
 
     var geocoder = new google.maps.Geocoder();
@@ -36,26 +41,7 @@ function initMap() {
 
 }
 
-function getZomatoEntitites(position, i) {
-
-    var zomato_url = "https://developers.zomato.com/api/v2.1/search"
-
-    zomato_url += "?" +$.param({
-        lat: position.lat(),
-        lon: position.lng()
-    });
-
-    $.ajax({
-        url: zomato_url,
-        headers: {  Accept : "text/plain; charset=utf-8",
-                    "Content-Type": "text/plain; charset=utf-8",
-                    "X-Zomato-API-Key": zomato_key },
-        success: function(data) {
-            zomato_key_mapping[neighborhood_places[i]] = data.restaurants[0].restaurant.id;
-        }
-    })
-}
-
+//google geocoding service called to get geo-coordinates of given address, then create associate marker and its events
 function creatMarker(geocoder,address, i) {
 
     geocoder.geocode({'address': address}, function(results, status) {
@@ -88,6 +74,28 @@ function creatMarker(geocoder,address, i) {
 
 }
 
+//given geo-coordinates, we need to find the 3rd party Zomato entity id to get the appropriate data when requested
+function getZomatoEntitites(position, i) {
+
+    var zomato_url = "https://developers.zomato.com/api/v2.1/search"
+
+    zomato_url += "?" +$.param({
+        lat: position.lat(),
+        lon: position.lng()
+    });
+
+    $.ajax({
+        url: zomato_url,
+        headers: {  Accept : "text/plain; charset=utf-8",
+                    "Content-Type": "text/plain; charset=utf-8",
+                    "X-Zomato-API-Key": zomato_key },
+        success: function(data) {
+            zomato_key_mapping[neighborhood_places[i]] = data.restaurants[0].restaurant.id;
+        }
+    })
+}
+
+//used to control the incon of the marker
 function make_marker(color) {
     var icon = {
         url: "http://maps.google.com/mapfiles/ms/icons/"+ color + "-dot.png",
@@ -99,6 +107,7 @@ function make_marker(color) {
     return icon;
 }
 
+//to reset all the markers to default state
 function reset_markers() {
 
     for (var place in markers) {
@@ -110,6 +119,7 @@ function reset_markers() {
 
 }
 
+//called on click of marker to show info window pop up with data from 3rd party API i.e Zomato
 function populate_info_window(marker) {
 
     if(!info_window) {
@@ -139,7 +149,6 @@ function populate_info_window(marker) {
                     "Content-Type": "text/plain; charset=utf-8",
                     "X-Zomato-API-Key": zomato_key },
         success: function(data) {
-            debugger;
             $('#rating span').append(data.user_rating.aggregate_rating + '/5');
             $('#cost span').append('Rs. ' + data.average_cost_for_two);
             $('#thumb_image').attr('src', data.thumb);
@@ -150,6 +159,7 @@ function populate_info_window(marker) {
 
 }
 
+//knock out view model to do live search based on text input in search box
 var view_model = function() {
 
     var self = this;
@@ -177,6 +187,22 @@ var view_model = function() {
 
 };
 
+//event handling when user clicks a place to be searched
+$('#searchlist').on('click','.list-group-item',function(e){
+
+
+    var ko_context      = ko.contextFor(e.target);
+    var clicked_place   = ko_context.$data;
+
+    ko_context.$parent.searched_place(clicked_place);
+
+    $('#filter').click();
+
+    google.maps.event.trigger(markers[clicked_place],'click');
+
+});
+
+//event handling when user clicks the filter button, can be used for multiple places
 $('#filter').click(function(e){
 
     var filtered_places = ko.contextFor(e.target).$data.filtered_places_list();
