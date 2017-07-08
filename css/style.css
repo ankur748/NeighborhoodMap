@@ -1,7 +1,36 @@
-#map {
+html,
+body,
+.container,
+.row,
+.main-map {
+    height: 100%;
+    width: 100%;
+}
+
+#map-container {
     height: 100%;
 }
 
-html,body {
-    height: 100%;
+/*@media screen and (min-width: 993px) {
+
+    #searchlist {
+        display: all;
+    }
+
+    #hamburger-icon {
+        display: none;
+    }
+
+}
+
+@media screen and (max-width: 992px) {
+    #searchlist {
+        display: none;
+    }
+}*/
+
+#hamburger-icon {
+    position: fixed;
+    top: 20px;
+    right: 50px;
 }

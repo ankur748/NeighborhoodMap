@@ -130,7 +130,7 @@ function populate_info_window(marker) {
         return;
     }
 
-    info_window.setContent('<div>' + marker.title + '</div><br><div id="zomato_info"><img id="thumb_image" src=""><br><br><div id="rating"><span>User Rating: </span></div><div id="cost"><span>Cost for two: </span></div><br><div><b><i>Powered by Zomato</i></b></div></div>');
+    info_window.setContent('<div><b>' + marker.title + '</b></div><br><div id="zomato_info"><div id="rest-address"></div><br><div id="rating"><span><b>User Rating : </b></span></div><div id="cost"><span><b>Cost for 2 persons : </b></span></div><br><div><b><i>Powered by Zomato</i></b></div></div>');
     info_window.marker = marker;
 
     info_window.addListener('closeclick', function() {
@@ -149,11 +149,13 @@ function populate_info_window(marker) {
                     "Content-Type": "text/plain; charset=utf-8",
                     "X-Zomato-API-Key": zomato_key },
         success: function(data) {
-            $('#rating span').append(data.user_rating.aggregate_rating + '/5');
-            $('#cost span').append('Rs. ' + data.average_cost_for_two);
-            $('#thumb_image').attr('src', data.thumb);
+            $('#rest-address').text(data.location.address);
+            $('#rating span').append(data.user_rating.rating_text);
+            $('#cost span').append('Rs.' + data.average_cost_for_two);
         }
     })
+
+    map.panTo(new google.maps.LatLng(marker.position.lat(), marker.position.lng()));
 
     info_window.open(map, marker);
 
@@ -194,10 +196,6 @@ $('#searchlist').on('click','.list-group-item',function(e){
     var ko_context      = ko.contextFor(e.target);
     var clicked_place   = ko_context.$data;
 
-    ko_context.$parent.searched_place(clicked_place);
-
-    $('#filter').click();
-
     google.maps.event.trigger(markers[clicked_place],'click');
 
 });
@@ -218,6 +216,20 @@ $('#filter').click(function(e){
             marker.setMap(null);
         }
     }
+});
+
+//event handling when user presses enter in the search input box
+$('#searchinput').keypress(function (e) {
+    var key = e.which;
+
+    if (key == 13) {
+        $('#filter').click();
+    }
+
+});
+
+$('#hamburger-icon').on('visible', function() {
+    alert("do something");
 });
 
 ko.applyBindings(new view_model());
