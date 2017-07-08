@@ -37,7 +37,7 @@ function initMap() {
         } else {
             alert("Some error occured. Please recheck your configuration and reload again");
         }
-    })
+    });
 
 }
 
@@ -77,7 +77,7 @@ function creatMarker(geocoder,address, i) {
 //given geo-coordinates, we need to find the 3rd party Zomato entity id to get the appropriate data when requested
 function getZomatoEntitites(position, i) {
 
-    var zomato_url = "https://developers.zomato.com/api/v2.1/search"
+    var zomato_url = "https://developers.zomato.com/api/v2.1/search";
 
     zomato_url += "?" +$.param({
         lat: position.lat(),
@@ -92,7 +92,7 @@ function getZomatoEntitites(position, i) {
         success: function(data) {
             zomato_key_mapping[neighborhood_places[i]] = data.restaurants[0].restaurant.id;
         }
-    })
+    });
 }
 
 //used to control the incon of the marker
@@ -103,7 +103,7 @@ function make_marker(color) {
         origin: new google.maps.Point(0, 0),
         anchor: new google.maps.Point(17, 34),
         scaledSize: new google.maps.Size(30, 30)
-    }
+    };
     return icon;
 }
 
@@ -137,7 +137,7 @@ function populate_info_window(marker) {
         info_window.marker = null;
     });
 
-    var zomato_url = "https://developers.zomato.com/api/v2.1/restaurant"
+    var zomato_url = "https://developers.zomato.com/api/v2.1/restaurant";
 
     zomato_url += "?" +$.param({
         res_id: zomato_key_mapping[marker.title]
@@ -153,7 +153,7 @@ function populate_info_window(marker) {
             $('#rating span').append(data.user_rating.rating_text);
             $('#cost span').append('Rs.' + data.average_cost_for_two);
         }
-    })
+    });
 
     map.panTo(new google.maps.LatLng(marker.position.lat(), marker.position.lng()));
 
