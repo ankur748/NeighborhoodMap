@@ -76,7 +76,9 @@ function creatMarker(geocoder,address, i) {
             });
 
             markers[NEIGHBORHOOD_PLACES[i]] = marker;
-            getZomatoEntitites(position,i);
+            getZomatoEntitites(address,position,i);
+        } else {
+            alert("Unable to locate " + address);
         }
 
     });
@@ -84,7 +86,7 @@ function creatMarker(geocoder,address, i) {
 }
 
 //given geo-coordinates, we need to find the 3rd party Zomato entity id to get the appropriate data when requested
-function getZomatoEntitites(position, i) {
+function getZomatoEntitites(address, position, i) {
 
     var zomatoURL = "https://developers.zomato.com/api/v2.1/search";
 
@@ -100,6 +102,9 @@ function getZomatoEntitites(position, i) {
                     "X-Zomato-API-Key": ZOMATO_KEY },
         success: function(data) {
             zomatoKeyMapping[NEIGHBORHOOD_PLACES[i]] = data.restaurants[0].restaurant.id;
+        },
+        error: function() {
+            alert("Unable to fetch data from Zomato for " + address);
         }
     });
 }
@@ -139,7 +144,6 @@ function populateInfoWindow(marker) {
         return;
     }
 
-    infoWindow.setContent('<div><b>' + marker.title + '</b></div><br><div id="zomato_info"><div id="rest-address"></div><br><div id="rating"><span><b>User Rating : </b></span></div><div id="cost"><span><b>Cost for 2 persons : </b></span></div><br><div><b><i>Powered by Zomato</i></b></div></div>');
     infoWindow.marker = marker;
 
     infoWindow.addListener('closeclick', function() {
@@ -158,9 +162,16 @@ function populateInfoWindow(marker) {
                     "Content-Type": "text/plain; charset=utf-8",
                     "X-Zomato-API-Key": ZOMATO_KEY },
         success: function(data) {
-            $('#rest-address').text(data.location.address);
-            $('#rating span').append(data.user_rating.rating_text);
-            $('#cost span').append('Rs.' + data.average_cost_for_two);
+            infoWindow.setContent('<div><b>' + marker.title + '</b></div><br>' +
+                                  '<div>' +
+                                      '<div>'+ data.location.address + '</div><br>' +
+                                      '<div><span><b>User Rating : ' + data.user_rating.rating_text + '</b></span></div>' +
+                                      '<div><span><b>Cost for 2 persons : Rs.' + data.average_cost_for_two +'</b></span></div><br>' +
+                                      '<div><b><i>Powered by Zomato</i></b></div>' +
+                                  '</div>');
+        },
+        error: function() {
+            infoWindow.setContent("Unable to load data for " + marker.title + ". Please check your configuration/internet connection")
         }
     });
 
