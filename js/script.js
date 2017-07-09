@@ -126,7 +126,7 @@ function resetMarkers() {
 
     for (var place in markers) {
 
-        var marker  = markers[place];
+        var marker = markers[place];
         marker.setAnimation(null);
         marker.setIcon(makeMarker("blue"));
     }
@@ -207,24 +207,13 @@ var viewModel = function() {
 
     });
 
-};
+    self.locationClicked = function(location) {
+        google.maps.event.trigger(markers[location],'click');
+    }
 
-//event handling when user clicks a place to be searched
-$('#searchlist').on('click','.list-group-item',function(e){
+    self.searchedPlace.subscribe(function() {
 
-    var koContext = ko.contextFor(e.target);
-    var clickedPlace = koContext.$data;
-
-    google.maps.event.trigger(markers[clickedPlace],'click');
-
-});
-
-//event handling when user presses enter in the search input box
-$('#searchinput').keypress(function (e) {
-    var key = e.which;
-
-    if (key == 13) {
-        var filteredPlaces = ko.contextFor(e.target).$data.filteredPlacesList();
+        var filteredPlaces = self.filteredPlacesList();
 
         for (var place in markers) {
 
@@ -238,9 +227,9 @@ $('#searchinput').keypress(function (e) {
             }
         }
 
-    }
+    });
 
-});
+};
 
 ko.applyBindings(new viewModel());
 
