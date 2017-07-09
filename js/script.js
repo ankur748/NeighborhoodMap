@@ -171,7 +171,7 @@ function populateInfoWindow(marker) {
                                   '</div>');
         },
         error: function() {
-            infoWindow.setContent("Unable to load data for " + marker.title + ". Please check your configuration/internet connection")
+            infoWindow.setContent("Unable to load data for " + marker.title + ". Please check your configuration/internet connection");
         }
     });
 
