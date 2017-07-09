@@ -219,30 +219,25 @@ $('#searchlist').on('click','.list-group-item',function(e){
 
 });
 
-//event handling when user clicks the filter button, can be used for multiple places
-$('#filter').click(function(e){
-
-    var filteredPlaces = ko.contextFor(e.target).$data.filteredPlacesList();
-
-    for (var place in markers) {
-
-        var marker  = markers[place];
-        var index   = $.inArray(place, filteredPlaces);
-
-        if(index != -1) {
-            marker.setMap(map);
-        } else {
-            marker.setMap(null);
-        }
-    }
-});
-
 //event handling when user presses enter in the search input box
 $('#searchinput').keypress(function (e) {
     var key = e.which;
 
     if (key == 13) {
-        $('#filter').click();
+        var filteredPlaces = ko.contextFor(e.target).$data.filteredPlacesList();
+
+        for (var place in markers) {
+
+            var marker  = markers[place];
+            var index   = $.inArray(place, filteredPlaces);
+
+            if(index != -1) {
+                marker.setMap(map);
+            } else {
+                marker.setMap(null);
+            }
+        }
+
     }
 
 });

@@ -28,12 +28,7 @@
             <div class="col-md-3">
 
                 <div id="search-menu" class="form">
-                    <div class="input-group">
-                        <input id="searchinput" data-bind="textInput : searchedPlace" class="form-control" type="search" placeholder="Search...">
-                        <div class="input-group-btn">
-                            <button id="filter" class="btn btn-info" type="submit">Filter</button>
-                        </div>
-                    </div>
+                    <input id="searchinput" data-bind="textInput : searchedPlace" class="form-control" type="search" placeholder="Search...">
                     <br>
                     <div id="searchlist" class="list-group collapse in" data-bind="foreach: filteredPlacesList">
                         <a class="list-group-item"><span data-bind="text: $data"></span></a>
