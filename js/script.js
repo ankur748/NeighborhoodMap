@@ -209,7 +209,7 @@ var viewModel = function() {
 
     self.locationClicked = function(location) {
         google.maps.event.trigger(markers[location],'click');
-    }
+    };
 
     self.searchedPlace.subscribe(function() {
 
