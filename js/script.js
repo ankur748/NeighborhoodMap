@@ -1,24 +1,29 @@
 //to be configured to your data
-var neighborhood_city = 'Ludhiana'; //set to the city where your restaurants are based out of
-var neighborhood_places = ["Aman Chicken", "Indian Summer", "Rutba", "Barbeque Nation", "Bistro 226",
-"Rishi Dhaba", "Friend Dhaba", "Stardrunks", "Under Dogs", "Yellow Chilli"]; //restaurant names to be shown on map
-
-//3rd party API - to be configured to your API key
-var zomato_key = "427d11dab5abc0e5b2ce4b8882bff226";
+var NEIGHBORHOOD_CITY = 'Ludhiana'; //set to the city where your restaurants are based out of
+var NEIGHBORHOOD_PLACES = [ "Aman Chicken",
+                            "Indian Summer",
+                            "Rutba",
+                            "Barbeque Nation",
+                            "Bistro 226",
+                            "Rishi Dhaba",
+                            "Friend Dhaba",
+                            "Stardrunks",
+                            "Under Dogs",
+                            "Moti Mahal"]; //restaurant names to be shown on map
+var ZOMATO_KEY = "427d11dab5abc0e5b2ce4b8882bff226"; //3rd party API - to be configured to your API key
 
 //model used for application
 var map;
 var markers = {};
-var zomato_key_mapping = {};
-var info_window;
-var zomato_entities = {};
+var zomatoKeyMapping = {};
+var infoWindow;
 
 //intial callback after google map is initilised to center it to neighborhood city
 function initMap() {
 
     var geocoder = new google.maps.Geocoder();
 
-    geocoder.geocode({'address': neighborhood_city}, function(results, status) {
+    geocoder.geocode({'address': NEIGHBORHOOD_CITY}, function(results, status) {
 
         if (status === google.maps.GeocoderStatus.OK) {
 
@@ -28,17 +33,21 @@ function initMap() {
                 zoom: 13
             });
 
-            for (var i = 0; i < neighborhood_places.length; i++) {
+            for (var i = 0; i < NEIGHBORHOOD_PLACES.length; i++) {
 
-                var address = neighborhood_places[i] + ' ' + neighborhood_city;
+                var address = NEIGHBORHOOD_PLACES[i] + ' ' + NEIGHBORHOOD_CITY;
                 creatMarker(geocoder,address,i);
             }
 
         } else {
-            alert("Some error occured. Please recheck your configuration and reload again");
+            alert("Unable to load Google Maps");
         }
     });
 
+}
+
+function loadMapError() {
+    alert("Unable to use Google Maps API. Please check your configuration");
 }
 
 //google geocoding service called to get geo-coordinates of given address, then create associate marker and its events
@@ -52,21 +61,21 @@ function creatMarker(geocoder,address, i) {
 
             var marker = new google.maps.Marker({
                 position : position,
-                title : neighborhood_places[i],
+                title : NEIGHBORHOOD_PLACES[i],
                 animation: google.maps.Animation.DROP,
                 id: i,
                 map: map,
-                icon: make_marker("blue")
+                icon: makeMarker("blue")
             });
 
             marker.addListener('click', function(){
-                reset_markers();
-                this.setIcon(make_marker("red"));
+                resetMarkers();
+                this.setIcon(makeMarker("red"));
                 this.setAnimation(google.maps.Animation.BOUNCE);
-                populate_info_window(this);
+                populateInfoWindow(this);
             });
 
-            markers[neighborhood_places[i]] = marker;
+            markers[NEIGHBORHOOD_PLACES[i]] = marker;
             getZomatoEntitites(position,i);
         }
 
@@ -77,26 +86,26 @@ function creatMarker(geocoder,address, i) {
 //given geo-coordinates, we need to find the 3rd party Zomato entity id to get the appropriate data when requested
 function getZomatoEntitites(position, i) {
 
-    var zomato_url = "https://developers.zomato.com/api/v2.1/search";
+    var zomatoURL = "https://developers.zomato.com/api/v2.1/search";
 
-    zomato_url += "?" +$.param({
+    zomatoURL += "?" +$.param({
         lat: position.lat(),
         lon: position.lng()
     });
 
     $.ajax({
-        url: zomato_url,
+        url: zomatoURL,
         headers: {  Accept : "text/plain; charset=utf-8",
                     "Content-Type": "text/plain; charset=utf-8",
-                    "X-Zomato-API-Key": zomato_key },
+                    "X-Zomato-API-Key": ZOMATO_KEY },
         success: function(data) {
-            zomato_key_mapping[neighborhood_places[i]] = data.restaurants[0].restaurant.id;
+            zomatoKeyMapping[NEIGHBORHOOD_PLACES[i]] = data.restaurants[0].restaurant.id;
         }
     });
 }
 
 //used to control the incon of the marker
-function make_marker(color) {
+function makeMarker(color) {
     var icon = {
         url: "http://maps.google.com/mapfiles/ms/icons/"+ color + "-dot.png",
         size: new google.maps.Size(30, 30),
@@ -108,46 +117,46 @@ function make_marker(color) {
 }
 
 //to reset all the markers to default state
-function reset_markers() {
+function resetMarkers() {
 
     for (var place in markers) {
 
         var marker  = markers[place];
         marker.setAnimation(null);
-        marker.setIcon(make_marker("blue"));
+        marker.setIcon(makeMarker("blue"));
     }
 
 }
 
 //called on click of marker to show info window pop up with data from 3rd party API i.e Zomato
-function populate_info_window(marker) {
+function populateInfoWindow(marker) {
 
-    if(!info_window) {
-        info_window = new google.maps.InfoWindow();
+    if(!infoWindow) {
+        infoWindow = new google.maps.InfoWindow();
     }
 
-    if(info_window.marker == marker) {
+    if(infoWindow.marker == marker) {
         return;
     }
 
-    info_window.setContent('<div><b>' + marker.title + '</b></div><br><div id="zomato_info"><div id="rest-address"></div><br><div id="rating"><span><b>User Rating : </b></span></div><div id="cost"><span><b>Cost for 2 persons : </b></span></div><br><div><b><i>Powered by Zomato</i></b></div></div>');
-    info_window.marker = marker;
+    infoWindow.setContent('<div><b>' + marker.title + '</b></div><br><div id="zomato_info"><div id="rest-address"></div><br><div id="rating"><span><b>User Rating : </b></span></div><div id="cost"><span><b>Cost for 2 persons : </b></span></div><br><div><b><i>Powered by Zomato</i></b></div></div>');
+    infoWindow.marker = marker;
 
-    info_window.addListener('closeclick', function() {
-        info_window.marker = null;
+    infoWindow.addListener('closeclick', function() {
+        infoWindow.marker = null;
     });
 
-    var zomato_url = "https://developers.zomato.com/api/v2.1/restaurant";
+    var zomatoURL = "https://developers.zomato.com/api/v2.1/restaurant";
 
-    zomato_url += "?" +$.param({
-        res_id: zomato_key_mapping[marker.title]
+    zomatoURL += "?" +$.param({
+        res_id: zomatoKeyMapping[marker.title]
     });
 
     $.ajax({
-        url: zomato_url,
+        url: zomatoURL,
         headers: {  Accept : "text/plain; charset=utf-8",
                     "Content-Type": "text/plain; charset=utf-8",
-                    "X-Zomato-API-Key": zomato_key },
+                    "X-Zomato-API-Key": ZOMATO_KEY },
         success: function(data) {
             $('#rest-address').text(data.location.address);
             $('#rating span').append(data.user_rating.rating_text);
@@ -157,31 +166,31 @@ function populate_info_window(marker) {
 
     map.panTo(new google.maps.LatLng(marker.position.lat(), marker.position.lng()));
 
-    info_window.open(map, marker);
+    infoWindow.open(map, marker);
 
 }
 
 //knock out view model to do live search based on text input in search box
-var view_model = function() {
+var viewModel = function() {
 
     var self = this;
 
-    self.searched_place = ko.observable("");
-    self.places_list = ko.observableArray([]);
+    self.searchedPlace = ko.observable("");
+    self.placesList = ko.observableArray([]);
 
-    neighborhood_places.forEach(function(place){
-        self.places_list.push(place);
+    NEIGHBORHOOD_PLACES.forEach(function(place){
+        self.placesList.push(place);
     });
 
-    self.filtered_places_list = ko.computed(function() {
+    self.filteredPlacesList = ko.computed(function() {
 
-        var searched_place = self.searched_place().toLowerCase();
+        var searchedPlace = self.searchedPlace().toLowerCase();
 
-        if(!searched_place) {
-            return self.places_list();
+        if(!searchedPlace) {
+            return self.placesList();
         } else {
-            return ko.utils.arrayFilter(self.places_list(), function (place) {
-                return place.toLowerCase().indexOf(searched_place) !== -1;
+            return ko.utils.arrayFilter(self.placesList(), function (place) {
+                return place.toLowerCase().indexOf(searchedPlace) !== -1;
             });
         }
 
@@ -192,23 +201,22 @@ var view_model = function() {
 //event handling when user clicks a place to be searched
 $('#searchlist').on('click','.list-group-item',function(e){
 
+    var koContext = ko.contextFor(e.target);
+    var clickedPlace = koContext.$data;
 
-    var ko_context      = ko.contextFor(e.target);
-    var clicked_place   = ko_context.$data;
-
-    google.maps.event.trigger(markers[clicked_place],'click');
+    google.maps.event.trigger(markers[clickedPlace],'click');
 
 });
 
 //event handling when user clicks the filter button, can be used for multiple places
 $('#filter').click(function(e){
 
-    var filtered_places = ko.contextFor(e.target).$data.filtered_places_list();
+    var filteredPlaces = ko.contextFor(e.target).$data.filteredPlacesList();
 
     for (var place in markers) {
 
         var marker  = markers[place];
-        var index   = $.inArray(place, filtered_places);
+        var index   = $.inArray(place, filteredPlaces);
 
         if(index != -1) {
             marker.setMap(map);
@@ -228,7 +236,7 @@ $('#searchinput').keypress(function (e) {
 
 });
 
-ko.applyBindings(new view_model());
+ko.applyBindings(new viewModel());
 
 
 

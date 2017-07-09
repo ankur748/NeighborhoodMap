@@ -7,7 +7,7 @@ body,
     width: 100%;
 }
 
-#map-container {
+article, main,#map-container {
     height: 100%;
 }
 
